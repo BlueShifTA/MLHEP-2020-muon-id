@@ -22,8 +22,9 @@ SIMPLE_FEATURE_COLUMNS = ['ncl[0]', 'ncl[1]', 'ncl[2]', 'ncl[3]', 'avg_cs[0]',
        'Mextra_DX2[1]', 'Mextra_DX2[2]', 'Mextra_DX2[3]', 'Mextra_DY2[0]',
        'Mextra_DY2[1]', 'Mextra_DY2[2]', 'Mextra_DY2[3]', 'FOI_hits_N', 'PT', 'P']
 
-TRAIN_COLUMNS = ["label", "weight"]
+TRAIN_COLUMNS = ["label", "weight", "sWeight", "kinWeight"]
 
+# Not used: DZ, DT
 FOI_COLUMNS = ["FOI_hits_X", "FOI_hits_Y", "FOI_hits_T",
                "FOI_hits_Z", "FOI_hits_DX", "FOI_hits_DY", "FOI_hits_S"]
 
@@ -48,6 +49,15 @@ def load_full_test_csv(path):
                        dtype=types,
                        usecols=[ID_COLUMN]+SIMPLE_FEATURE_COLUMNS+FOI_COLUMNS)
     return test
+
+def load_full_train_csv(path):
+    converters = dict(zip(FOI_COLUMNS, repeat(parse_array)))
+    types = dict(zip(SIMPLE_FEATURE_COLUMNS, repeat(np.float32)))
+    train = pd.read_csv(os.path.join(path, "train.csv.gz"),
+                       index_col="id", converters=converters,
+                       dtype=types,
+                       usecols=[ID_COLUMN]+SIMPLE_FEATURE_COLUMNS+FOI_COLUMNS+TRAIN_COLUMNS)
+    return train
 
 
 def find_closest_hit_per_station(row):
