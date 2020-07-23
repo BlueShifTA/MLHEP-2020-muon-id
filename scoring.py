@@ -56,3 +56,4 @@ def rejection90(labels, predictions, sample_weight=None):
 
 rejection90_sklearn = make_scorer(
     get_rejection_at_efficiency, needs_threshold=True, threshold=0.9)
+print(rejection90_sklearn)
