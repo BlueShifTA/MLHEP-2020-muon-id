@@ -32,6 +32,9 @@ ID_COLUMN = "id"
 N_STATIONS = 4
 FEATURES_PER_STATION = 6
 N_FOI_FEATURES = N_STATIONS*FEATURES_PER_STATION
+
+output_params = ["id", "label", "weight", "sWeight", "kinWeight"]
+
 # The value to use for stations with missing hits
 # when computing FOI features
 EMPTY_FILLER = 1000
@@ -40,14 +43,25 @@ def parse_array(line, dtype=np.float32):
     return np.fromstring(line[1:-1], sep=" ", dtype=dtype)
 
 
-def load_full_test_csv(path):
+def load_full_test_csv(path, N_row):
     converters = dict(zip(FOI_COLUMNS, repeat(parse_array)))
     types = dict(zip(SIMPLE_FEATURE_COLUMNS, repeat(np.float32)))
-    test = pd.read_csv(os.path.join(path, "test_public_%s.csv.gz" % VERSION),
+    test = pd.read_csv(os.path.join(path, "test-features.csv.gz"),
                        index_col="id", converters=converters,
                        dtype=types,
-                       usecols=[ID_COLUMN]+SIMPLE_FEATURE_COLUMNS+FOI_COLUMNS)
+                       usecols=[ID_COLUMN]+SIMPLE_FEATURE_COLUMNS+FOI_COLUMNS,
+                       nrows = N_row)
     return test
+
+def load_full_train_csv(path, N_row = None):
+    converters = dict(zip(FOI_COLUMNS, repeat(parse_array)))
+    types = dict(zip(SIMPLE_FEATURE_COLUMNS, repeat(np.float32)))
+    train = pd.read_csv(os.path.join(path, "train.csv.gz"),
+                       index_col="id", converters=converters,
+                       dtype=types,
+                       usecols=[ID_COLUMN]+SIMPLE_FEATURE_COLUMNS+FOI_COLUMNS+output_params,
+                       nrows = N_row)
+    return train
 
 
 def find_closest_hit_per_station(row):
